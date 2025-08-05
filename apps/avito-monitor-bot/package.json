@@ -6,13 +6,20 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "/": "----------------- MIGRATIONS -------------------",
+    "typeorm": "typeorm-ts-node-commonjs",
+    "mg:schema": "npm run typeorm schema:log -- -d ormconfig.ts",
+    "mg:create": "npm run typeorm migration:create",
+    "mg:generate": "npm run typeorm migration:generate -- -p -d ormconfig.ts",
+    "mg:run": "npm run typeorm migration:run -- -d ormconfig.ts",
+    "mg:revert": "npm run typeorm migration:revert -- -d ormconfig.ts",
+    "//": "------------------- BUILD ----------------------",
     "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "///": "------------------ START ----------------------",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"
+    "start:prod": "yarn build && node dist/main"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.1",

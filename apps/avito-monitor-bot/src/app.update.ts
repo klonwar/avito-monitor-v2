@@ -6,6 +6,7 @@ import { Injectable, UseFilters } from '@nestjs/common'
 
 import { BotService } from './bot/bot.service'
 import { AnyExceptionFilter } from './bot/filters/any-exception.filter'
+import { BotScene } from './bot/scenes/scenes.constants'
 
 @Update()
 @Injectable()
@@ -20,7 +21,6 @@ export class AppUpdate {
   @Start()
   @UseFilters(AnyExceptionFilter)
   async start(@Ctx() context: SceneContext) {
-    await context.reply('here')
-    //await context.scene.enter(BotScene.REGISTRATION)
+    await context.scene.enter(BotScene.REGISTRATION)
   }
 }

@@ -1,8 +1,11 @@
+import AppDataSource from 'ormconfig'
+
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { BotModule } from './bot/bot.module'
+import { User } from './model/user/user.model'
 import { AppUpdate } from './app.update'
 
 @Module({
@@ -11,12 +14,10 @@ import { AppUpdate } from './app.update'
       isGlobal: true,
     }),
     TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: './db.sqlite',
-      synchronize: true,
+      ...AppDataSource.options,
       autoLoadEntities: true,
     }),
-    TypeOrmModule.forFeature([]),
+    TypeOrmModule.forFeature([User]),
     BotModule,
   ],
   providers: [AppUpdate],

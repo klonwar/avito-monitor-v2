@@ -7,6 +7,9 @@ import { Logger, Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
+import { User } from '../model/user/user.model'
+
+import { ScenesModule } from './scenes/scenes.module'
 import { BotService } from './bot.service'
 import { MessageService } from './message.service'
 
@@ -28,10 +31,11 @@ import { MessageService } from './message.service'
         ],
       }),
     }),
-    TypeOrmModule.forFeature([]),
+    TypeOrmModule.forFeature([User]),
+    ScenesModule,
   ],
   controllers: [],
   providers: [BotService, MessageService],
-  exports: [BotService],
+  exports: [ScenesModule, BotService],
 })
 export class BotModule {}
