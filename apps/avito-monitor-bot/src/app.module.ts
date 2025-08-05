@@ -1,10 +1,24 @@
 import { Module } from '@nestjs/common'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
+import { ConfigModule } from '@nestjs/config'
+import { TypeOrmModule } from '@nestjs/typeorm'
+
+import { BotModule } from './bot/bot.module'
+import { AppUpdate } from './app.update'
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    TypeOrmModule.forRoot({
+      type: 'sqlite',
+      database: './db.sqlite',
+      synchronize: true,
+      autoLoadEntities: true,
+    }),
+    TypeOrmModule.forFeature([]),
+    BotModule,
+  ],
+  providers: [AppUpdate],
 })
 export class AppModule {}
