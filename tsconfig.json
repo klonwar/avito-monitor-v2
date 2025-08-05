@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "target": "ESNext"
+  },
+  "include": ["apps", "packages"],
+  "exclude": ["**/.*/", "**/node_modules", "**/dist"],
+  "ts-node": {
+    "transpileOnly": true,
+    "files": true,
+    "esm": true,
+    "experimentalSpecifierResolution": "node",
+    "pretty": true,
+    "experimentalResolver": true
+  }
+}
