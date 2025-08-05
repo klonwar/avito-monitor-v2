@@ -1,12 +1,11 @@
-import AppDataSource from 'ormconfig'
-
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
+import { CqrsModule } from '@nestjs/cqrs'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
-import { BotModule } from './bot/bot.module'
-import { User } from './model/user/user.model'
-import { AppUpdate } from './app.update'
+import { BotModule } from '~/app/bot/bot.module'
+
+import AppDataSource from '../ormconfig'
 
 @Module({
   imports: [
@@ -17,9 +16,8 @@ import { AppUpdate } from './app.update'
       ...AppDataSource.options,
       autoLoadEntities: true,
     }),
-    TypeOrmModule.forFeature([User]),
+    CqrsModule.forRoot(),
     BotModule,
   ],
-  providers: [AppUpdate],
 })
 export class AppModule {}

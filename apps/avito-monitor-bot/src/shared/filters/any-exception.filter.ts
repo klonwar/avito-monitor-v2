@@ -19,7 +19,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
   catch(exception, host): any {
     const tg = TelegrafExecutionContext.create(host)
     const botContext = tg.getContext<Context>()
-    const message = 'text' in botContext.message! ? `"${botContext.message.text}"` : `(not text)`
+    const message = botContext.message && 'text' in botContext.message ? `"${botContext.message.text}"` : `(not text)`
 
     this.logger.error(
       `Exception caught when user @${botContext.from?.username || botContext.from?.id} wrote message ${message}`,
