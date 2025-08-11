@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 
 import { Link } from '~/entities/link/models/link.model'
 import { NotifyCommand } from '~/entities/task/features/notify/notify.command'
-import type { TaskService } from '~/entities/task/task.service'
+import { TaskService } from '~/entities/task/task.service'
 import { User } from '~/entities/user/models/user.model'
 
 @CommandHandler(NotifyCommand)
@@ -35,8 +35,9 @@ export class NotifyHandler implements ICommandHandler<NotifyCommand> {
 
     if (userId) {
       this.logger.log(`Notify about ${diff.newItems.length} new items`)
-      diff.newItems.forEach((newItem) => {
-        if (!this.taskService.isInSeenIds(linkId, newItem.id)) {
+      diff.newItems
+        .filter((item) => !this.taskService.isInSeenIds(linkId, item.id))
+        .forEach((newItem) => {
           // @TODO: Better message formatting
           this.bot.telegram.sendMessage(
             userId,
@@ -45,8 +46,7 @@ export class NotifyHandler implements ICommandHandler<NotifyCommand> {
               parse_mode: 'Markdown',
             },
           )
-        }
-      })
+        })
     }
   }
 }
