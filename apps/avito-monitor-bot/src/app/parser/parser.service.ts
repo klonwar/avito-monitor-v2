@@ -36,33 +36,40 @@ export class ParserService implements OnModuleInit {
   }
 
   private async tick() {
-    const links = await this.linkRepository.find()
-    this.logger.log(`[Tick] Parse ${links.length} links`)
+    try {
+      const links = await this.linkRepository.find()
+      this.logger.log(`[Tick] Parse ${links.length} links`)
 
-    for (const link of links) {
-      const fetched = await this.commandBus.execute(new FetchCommand(link))
+      for (const link of links) {
+        // @TODO: Research option to create separate strategies for different link types (check with regexp?)
+        //        avito, fresh, auto.ru, drom
+        const fetched = await this.commandBus.execute(new FetchCommand(link))
 
-      if (!fetched) {
-        this.logger.warn(`[Tick] Failed to fetch link: ${link.id}`)
-        continue
+        if (!fetched) {
+          this.logger.warn(`[Tick] Failed to fetch link: ${link.id}`)
+          continue
+        }
+
+        const parsedData = await this.commandBus.execute<ParseCommand, ParsedData | null>(new ParseCommand(link))
+
+        if (!parsedData) {
+          this.logger.warn(`[Tick] Failed to parse link: ${link.id}`)
+          continue
+        }
+
+        const diff = await this.commandBus.execute<DiffCommand, DiffResult>(new DiffCommand(link, parsedData))
+
+        if (diff.newItems.length) {
+          await this.commandBus.execute(new NotifyCommand(link, diff))
+        }
+
+        // @TODO: Some delay?
       }
 
-      const parsedData = await this.commandBus.execute<ParseCommand, ParsedData | null>(new ParseCommand(link))
-
-      if (!parsedData) {
-        this.logger.warn(`[Tick] Failed to parse link: ${link.id}`)
-        continue
-      }
-
-      const diff = await this.commandBus.execute<DiffCommand, DiffResult>(new DiffCommand(link, parsedData))
-
-      if (diff.newItems.length) {
-        await this.commandBus.execute(new NotifyCommand(link, diff))
-      }
-
-      // @TODO: Some delay?
+      this.logger.log(`[Tick] Completed`)
+    } catch (e) {
+      this.logger.error(`[Tick] Failed`)
+      this.logger.error(e.stack)
     }
-
-    this.logger.log(`[Tick] Completed`)
   }
 }

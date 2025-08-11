@@ -23,6 +23,13 @@ export class FetchHandler implements ICommandHandler<FetchCommand> {
 
     const response = await page.goto(link.url)
 
+    const isCaptcha = await page.$(`[class*="firewall-container"]`)
+
+    if (isCaptcha) {
+      this.logger.warn(`Captcha detected`)
+      return false
+    }
+
     if (!response || !response.ok()) return false
 
     const needToEnableLocalPriority = !!(await page.$(
@@ -48,7 +55,7 @@ export class FetchHandler implements ICommandHandler<FetchCommand> {
 
     await location.click()
 
-    await page.waitForSelector('[class*="popup-localPriority"]', { timeout: 5000 })
+    await page.waitForSelector('[class*="popup-localPriority"]')
     const checkbox = await page.$('[class*="popup-localPriority"]')
 
     await checkbox!.click()
