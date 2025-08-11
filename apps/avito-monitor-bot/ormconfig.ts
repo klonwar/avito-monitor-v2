@@ -7,7 +7,6 @@ const AppDataSource = new DataSource({
   // CLI commands will execute in ts context, using ".ts" files from "src" dir
   // NestJS in runtime will use ".js" files from "dist" dir
   entities: [path.join(__dirname, `**`, `*.model.{ts,js}`)],
-  subscribers: [path.join(__dirname, `**`, `*.subscriber.{ts,js}`)],
   migrations: [path.join(__dirname, `migrations`, `**`, `*.{ts,js}`)],
   migrationsTableName: `migrations_typeorm`,
   synchronize: false,

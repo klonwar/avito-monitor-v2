@@ -4,6 +4,7 @@ import { CqrsModule } from '@nestjs/cqrs'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { BotModule } from '~/app/bot/bot.module'
+import { ParserModule } from '~/app/parser/parser.module'
 
 import AppDataSource from '../ormconfig'
 
@@ -16,8 +17,10 @@ import AppDataSource from '../ormconfig'
       ...AppDataSource.options,
       autoLoadEntities: true,
     }),
+
     CqrsModule.forRoot(),
     BotModule,
+    ParserModule,
   ],
 })
 export class AppModule {}
