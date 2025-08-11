@@ -24,10 +24,22 @@ export class DiffHandler implements ICommandHandler<DiffCommand> {
     // todo detect removed
     // todo detect changed
 
-    const newItems = differenceBy(newState, prevState, 'id')
+    // Ensuring that new items are appearing at the top of the list
+    const prevIds = new Set(prevState.map((i) => i.id))
+    const anchorIndex = newState.findIndex((i) => prevIds.has(i.id))
+
+    if (anchorIndex < 0) {
+      this.logger.warn(`No matching items found for link ${link.id}, skipping diff`)
+    }
+
+    const headEnd = anchorIndex >= 0 ? anchorIndex : 0
+
+    const headSlice = newState.slice(0, headEnd)
+
+    const newItems = differenceBy(headSlice, prevState, 'id')
 
     this.logger.log(
-      `Compare prevState: ${prevState.length} and newState: ${newState.length}, found ${newItems.length} new items`,
+      `Compare prevState: ${prevState.length} and newState: ${newState.length}, headSlice: ${headSlice}, found ${newItems.length} new items`,
     )
 
     this.taskService.setState(link.id, newState)
