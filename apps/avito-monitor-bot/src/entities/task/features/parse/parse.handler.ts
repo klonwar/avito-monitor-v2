@@ -11,7 +11,7 @@ export class ParseHandler implements ICommandHandler<ParseCommand> {
 
   // todo refactor?
   public async execute({ link }: ParseCommand): Promise<ParsedData | null> {
-    const page = this.taskService.pages.get(link.id)
+    const page = this.taskService.getPage(link.id)
 
     if (!page) {
       console.error(`No page found with id ${link.id}`)

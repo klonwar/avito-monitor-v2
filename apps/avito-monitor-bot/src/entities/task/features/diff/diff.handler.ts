@@ -1,5 +1,6 @@
 import { differenceBy } from 'lodash'
 
+import { Logger } from '@nestjs/common'
 import type { ICommandHandler } from '@nestjs/cqrs'
 import { CommandHandler } from '@nestjs/cqrs'
 
@@ -9,23 +10,27 @@ import { TaskService } from '~/entities/task/task.service'
 
 @CommandHandler(DiffCommand)
 export class DiffHandler implements ICommandHandler<DiffCommand> {
+  private readonly logger = new Logger(DiffHandler.name)
+
   constructor(private readonly taskService: TaskService) {}
 
   public async execute({ link, newState }: DiffCommand): Promise<DiffResult> {
-    if (!this.taskService.states.has(link.id)) {
-      this.taskService.states.set(link.id, newState)
+    if (!this.taskService.hasState(link.id)) {
+      this.taskService.setState(link.id, newState)
     }
 
-    const prevState = this.taskService.states.get(link.id)!
+    const prevState = this.taskService.getState(link.id)!
 
     // todo detect removed
     // todo detect changed
 
-    // todo invent seenIds if duplicates
-
     const newItems = differenceBy(newState, prevState, 'id')
 
-    this.taskService.states.set(link.id, newState)
+    this.logger.log(
+      `Compare prevState: ${prevState.length} and newState: ${newState.length}, found ${newItems.length} new items`,
+    )
+
+    this.taskService.setState(link.id, newState)
 
     return { newItems }
   }

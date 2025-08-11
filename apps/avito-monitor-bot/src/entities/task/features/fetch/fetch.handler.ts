@@ -14,7 +14,7 @@ export class FetchHandler implements ICommandHandler<FetchCommand> {
   constructor(private readonly taskService: TaskService) {}
 
   public async execute({ link }: FetchCommand): Promise<boolean> {
-    const page = this.taskService.pages.get(link.id)
+    const page = this.taskService.getPage(link.id)
 
     if (!page) {
       this.logger.error(`No page found with id ${link.id}`)

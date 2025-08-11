@@ -3,22 +3,27 @@ import { Telegraf } from 'telegraf'
 import { SceneContext } from 'telegraf/scenes'
 import { Repository } from 'typeorm'
 
+import { Logger } from '@nestjs/common'
 import type { ICommandHandler } from '@nestjs/cqrs'
 import { CommandHandler } from '@nestjs/cqrs'
 import { InjectRepository } from '@nestjs/typeorm'
 
 import { Link } from '~/entities/link/models/link.model'
 import { NotifyCommand } from '~/entities/task/features/notify/notify.command'
+import type { TaskService } from '~/entities/task/task.service'
 import { User } from '~/entities/user/models/user.model'
 
 @CommandHandler(NotifyCommand)
 export class NotifyHandler implements ICommandHandler<NotifyCommand> {
+  private readonly logger = new Logger(NotifyHandler.name)
+
   constructor(
     @InjectBot() private bot: Telegraf<SceneContext>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
     @InjectRepository(Link)
     private linkRepository: Repository<Link>,
+    private taskService: TaskService,
   ) {}
 
   public async execute({ link: { id: linkId }, diff }: NotifyCommand): Promise<void> {
@@ -28,16 +33,19 @@ export class NotifyHandler implements ICommandHandler<NotifyCommand> {
     })
     const { id: userId } = link?.user || {}
 
-    // @TODO: Better message formatting
     if (userId) {
+      this.logger.log(`Notify about ${diff.newItems.length} new items`)
       diff.newItems.forEach((newItem) => {
-        this.bot.telegram.sendMessage(
-          userId,
-          `❗ New item found!\n\n` + `[Link](https://www.avito.ru${newItem.link})`,
-          {
-            parse_mode: 'Markdown',
-          },
-        )
+        if (!this.taskService.isInSeenIds(linkId, newItem.id)) {
+          // @TODO: Better message formatting
+          this.bot.telegram.sendMessage(
+            userId,
+            `❗ ${newItem.title}\n\n` + `💰 ${newItem.price}\n\n` + `[Link](https://www.avito.ru${newItem.link})`,
+            {
+              parse_mode: 'Markdown',
+            },
+          )
+        }
       })
     }
   }
