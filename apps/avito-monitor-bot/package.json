@@ -19,7 +19,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "yarn build && node dist/main"
+    "start:prod": "yarn build && node dist/src/main"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.1",

@@ -10,6 +10,10 @@
     "libs/*"
   ],
   "scripts": {
+    "/": "------------------- BOT -------------------",
+    "bot:dev": "yarn workspace avito-monitor-bot start:dev",
+    "bot:prod": "yarn workspace avito-monitor-bot start:prod",
+    "//": "------------------ MONOREPO CONTROL -------------------",
     "build": "yarn workspaces foreach --all --topological run build",
     "lint": "yarn workspaces foreach --all run lint",
     "postinstall": "husky || true",
