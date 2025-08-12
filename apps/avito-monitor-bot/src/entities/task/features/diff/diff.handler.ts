@@ -36,7 +36,9 @@ export class DiffHandler implements ICommandHandler<DiffCommand> {
 
     const headSlice = newState.slice(0, headEnd)
 
-    const newItems = differenceBy(headSlice, prevState, 'id')
+    const newItems = differenceBy(headSlice, prevState, 'id').filter(
+      (item) => !this.taskService.hasSeen(link.id, item.id),
+    )
 
     this.logger.log(
       `Compare prevState: ${prevState.length} and newState: ${newState.length}, headSlice: ${headSlice}, found ${newItems.length} new items`,

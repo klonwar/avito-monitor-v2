@@ -10,7 +10,6 @@ import { InjectRepository } from '@nestjs/typeorm'
 
 import { Link } from '~/entities/link/models/link.model'
 import { NotifyCommand } from '~/entities/task/features/notify/notify.command'
-import { TaskService } from '~/entities/task/task.service'
 import { User } from '~/entities/user/models/user.model'
 
 @CommandHandler(NotifyCommand)
@@ -23,7 +22,6 @@ export class NotifyHandler implements ICommandHandler<NotifyCommand> {
     private userRepository: Repository<User>,
     @InjectRepository(Link)
     private linkRepository: Repository<Link>,
-    private taskService: TaskService,
   ) {}
 
   public async execute({ link: { id: linkId }, diff }: NotifyCommand): Promise<void> {
@@ -35,18 +33,16 @@ export class NotifyHandler implements ICommandHandler<NotifyCommand> {
 
     if (userId) {
       this.logger.log(`Notify about ${diff.newItems.length} new items`)
-      diff.newItems
-        .filter((item) => !this.taskService.isInSeenIds(linkId, item.id))
-        .forEach((newItem) => {
-          // @TODO: Better message formatting
-          this.bot.telegram.sendMessage(
-            userId,
-            `❗ ${newItem.title}\n\n` + `💰 ${newItem.price}\n\n` + `[Link](https://www.avito.ru${newItem.link})`,
-            {
-              parse_mode: 'Markdown',
-            },
-          )
-        })
+      diff.newItems.forEach((newItem) => {
+        // @TODO: Better message formatting
+        this.bot.telegram.sendMessage(
+          userId,
+          `❗ ${newItem.title}\n\n` + `💰 ${newItem.price}\n\n` + `[Link](https://www.avito.ru${newItem.link})`,
+          {
+            parse_mode: 'Markdown',
+          },
+        )
+      })
     }
   }
 }

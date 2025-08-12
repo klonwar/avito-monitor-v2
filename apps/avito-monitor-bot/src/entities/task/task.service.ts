@@ -86,7 +86,7 @@ export class TaskService implements OnModuleInit {
     })
   }
 
-  isInSeenIds(linkId: number, itemId: string): boolean {
+  hasSeen(linkId: number, itemId: string): boolean {
     const seenIdsSet = this.seenIds.get(linkId)
     if (!seenIdsSet) {
       this.logger.error(`No seenIds set found for link id ${linkId}`)
