@@ -32,7 +32,13 @@ export class DiffHandler implements ICommandHandler<DiffCommand> {
       this.logger.warn(`No matching items found for link ${link.id}, skipping diff`)
     }
 
-    const headEnd = anchorIndex >= 0 ? anchorIndex : 0
+    const SLACK = 5 // сколько позиций после первого "старого" элемента считаем "головой"
+    const MAX_HEAD_WINDOW = 5 // максимум элементов, если якоря не нашли
+
+    const headEnd =
+      anchorIndex >= 0
+        ? Math.min(newState.length, anchorIndex + SLACK) // захватываем 2-е/3-е места и чуть дальше
+        : Math.min(newState.length, MAX_HEAD_WINDOW) // защита: не берём весь список
 
     const headSlice = newState.slice(0, headEnd)
 
@@ -41,7 +47,7 @@ export class DiffHandler implements ICommandHandler<DiffCommand> {
     )
 
     this.logger.log(
-      `Compare prevState: ${prevState.length} and newState: ${newState.length}, headSlice: ${headSlice}, found ${newItems.length} new items`,
+      `Compare prevState: ${prevState.length} and newState: ${newState.length}, found ${newItems.length} new items`,
     )
 
     this.taskService.setState(link.id, newState)
